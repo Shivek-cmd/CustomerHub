@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  fetchMembershipById,
+  createMembership,
+  updateMembership,
+} from "../api/membershipApi";
 
 const MembershipForm = () => {
   const [memberName, setMemberName] = useState("");
@@ -13,10 +17,7 @@ const MembershipForm = () => {
     if (id) {
       const fetchMembership = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:3000/api/memberships/get/${id}`
-          );
-          const membership = response.data;
+          const membership = await fetchMembershipById(id);
           setMemberName(membership.memberName);
           setMembershipType(membership.membershipType);
           setStatus(membership.status);
@@ -34,15 +35,9 @@ const MembershipForm = () => {
     try {
       const membershipData = { memberName, membershipType, status };
       if (id) {
-        await axios.put(
-          `http://localhost:3000/api/memberships/update/${id}`,
-          membershipData
-        );
+        await updateMembership(id, membershipData);
       } else {
-        await axios.post(
-          "http://localhost:3000/api/memberships/create",
-          membershipData
-        );
+        await createMembership(membershipData);
       }
       navigate("/memberships");
     } catch (error) {
@@ -53,8 +48,9 @@ const MembershipForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg"
+      className="max-w-lg mx-auto p-4 mt-32 bg-white shadow-md rounded-lg"
     >
+      <h1 className="text-3xl font-bold text-center p-4">Add members</h1>
       <div className="mb-4">
         <input
           type="text"

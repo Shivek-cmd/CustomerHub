@@ -1,38 +1,34 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { fetchCustomers, deleteCustomer } from "../api/customerApi"; // Adjust the import path as needed
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const getCustomers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/customers/get"
-        ); // Correct endpoint to fetch all customers
-        setCustomers(response.data);
+        const data = await fetchCustomers();
+        setCustomers(data);
       } catch (error) {
-        console.error("Error fetching customers:", error);
+        toast.error("Failed to fetch customers.");
       }
     };
 
-    fetchCustomers();
+    getCustomers();
   }, []);
-  useEffect(() => {
-    console.log("customers", customers);
-    console.log("membership", customers.membership);
-  }, [customers]);
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/customers/delete/${id}`); // Correct endpoint to delete a customer
+      await deleteCustomer(id);
       setCustomers(customers.filter((customer) => customer._id !== id));
+      toast.success("Customer Deleted Successfully");
     } catch (error) {
-      console.error("Error deleting customer:", error);
+      toast.error("Failed to delete customer.");
     }
   };
-
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Customer List</h2>
@@ -62,7 +58,7 @@ const CustomerList = () => {
                 Status
               </th>
               <th className="py-3 px-4 text-left text-gray-600 font-semibold">
-                Membership Type
+                Membership
               </th>
               <th className="py-3 px-4 text-left text-gray-600 font-semibold">
                 Actions

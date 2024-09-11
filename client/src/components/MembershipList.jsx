@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import { fetchAllMemberships, deleteMembership } from "../api/membershipApi";
 
 const MembershipList = () => {
   const [memberships, setMemberships] = useState([]);
 
   useEffect(() => {
-    const fetchMemberships = async () => {
+    const getMemberships = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/memberships/get"
-        );
-        setMemberships(response.data);
-        console.log(memberships);
+        const data = await fetchAllMemberships();
+        setMemberships(data);
+        console.log(data);
       } catch (error) {
         console.error("Error fetching memberships:", error);
       }
     };
 
-    fetchMemberships();
+    getMemberships();
   }, []);
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/memberships/delete/${id}`);
+      await deleteMembership(id);
       setMemberships(memberships.filter((membership) => membership._id !== id));
     } catch (error) {
       console.error("Error deleting membership:", error);

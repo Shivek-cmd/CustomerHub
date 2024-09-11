@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  fetchCustomerById,
+  createCustomer,
+  updateCustomer,
+} from "../api/customerApi";
+import axios from "axios";
+
 const CustomerForm = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -33,11 +39,7 @@ const CustomerForm = () => {
     if (id) {
       const fetchCustomer = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:3000/api/customers/get/${id}`
-          );
-          const customer = response.data;
-
+          const customer = await fetchCustomerById(id);
           setFirstname(customer.firstname);
           setLastname(customer.lastname);
           setContact(customer.contact);
@@ -52,6 +54,7 @@ const CustomerForm = () => {
       fetchCustomer();
     }
   }, [id]);
+
   const validateForm = () => {
     const newErrors = {};
     if (!firstname) newErrors.firstname = "First name is required";
@@ -65,10 +68,11 @@ const CustomerForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error("something is wrong ");
+      toast.error("Something is wrong.");
       return;
     }
     try {
@@ -81,24 +85,18 @@ const CustomerForm = () => {
         membership,
       };
       if (id) {
-        await axios.put(
-          `http://localhost:3000/api/customers/update/${id}`,
-          customerData
-        );
+        await updateCustomer(id, customerData);
         toast.success("Customer updated successfully.");
       } else {
-        await axios.post(
-          "http://localhost:3000/api/customers/post",
-          customerData
-        );
+        await createCustomer(customerData);
         toast.success("Customer added successfully.");
       }
       navigate("/");
     } catch (error) {
       console.error("Error saving customer:", error);
+      toast.error("Failed to save customer.");
     }
   };
-
   return (
     <div className="max-w-lg mx-auto p-6 mt-8 bg-white shadow-lg rounded-lg border border-gray-200">
       <h1 className="text-center p-4 text-3xl font-bold">
