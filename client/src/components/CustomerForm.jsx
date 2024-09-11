@@ -26,7 +26,7 @@ const CustomerForm = () => {
     const fetchMemberships = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/memberships/get"
+          "https://customer-hub.onrender.com/api/memberships/get"
         );
         setMembershipOptions(response.data);
         console.log("membership otpion", membershipOptions);
